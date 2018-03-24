@@ -24,13 +24,6 @@
 #include "tbb_stddef.h"
 #include "tbb_machine.h"
 
-#ifdef TBB_USE_EXCEPTIONS
-#pragma message("TBB_USE_EXCEPTIONS defined")
-#if TBB_USE_EXCEPTIONS == 0
-#pragma message("TBB_USE_EXCEPTIONS == 0")
-#endif
-#endif
-
 namespace tbb {
 
 //! Block of space aligned sufficiently to construct an array T with N elements.

@@ -30,6 +30,7 @@
 **/
 
 #define TBB_USE_EXCEPTIONS 0
+#define TBB_USE_CAPTURED_EXCEPTION 0
 
 /* This macro marks incomplete code or comments describing ideas which are considered for the future.
  * See also for plain comment with TODO and FIXME marks for small improvement opportunities.
