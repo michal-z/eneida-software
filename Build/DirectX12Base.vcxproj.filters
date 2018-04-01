@@ -33,19 +33,19 @@
     <ClCompile Include="..\Source\External\EASTL\source\thread_support.cpp">
       <Filter>EASTL</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\$(ProjectName)\Triangle.cpp" />
     <ClCompile Include="..\Source\$(ProjectName)\Renderer.cpp" />
     <ClCompile Include="..\Source\$(ProjectName)\Pch.cpp" />
+    <ClCompile Include="..\Source\$(ProjectName)\$(ProjectName).cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\$(ProjectName)\Pch.h" />
     <ClInclude Include="..\Source\$(ProjectName)\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Source\Triangle\Triangle.hlsli" />
+    <FxCompile Include="..\Source\DirectX12Base\BasicPs.hlsl" />
+    <FxCompile Include="..\Source\DirectX12Base\BasicVs.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Source\Triangle\TrianglePs.hlsl" />
-    <FxCompile Include="..\Source\Triangle\TriangleVs.hlsl" />
+    <None Include="..\Source\DirectX12Base\Basic.hlsli" />
   </ItemGroup>
 </Project>

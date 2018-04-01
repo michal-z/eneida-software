@@ -9,18 +9,18 @@ struct ConstData
 ConstantBuffer<ConstData> s_Cb;
 
 
-#if defined(VS_TRIANGLE)
+#if defined(VS_BASIC)
 
 [RootSignature(RootSigDecl)]
-float4 TriangleVs(float3 pos : POSITION) : SV_POSITION
+float4 BasicVs(float3 pos : POSITION) : SV_POSITION
 {
 	return mul(float4(pos, 1.0f), s_Cb.worldToProj);
 }
 
-#elif defined(PS_TRIANGLE)
+#elif defined(PS_BASIC)
 
 [RootSignature(RootSigDecl)]
-float4 TrianglePs() : SV_TARGET
+float4 BasicPs() : SV_TARGET
 {
 	return float4(0.0f, 0.5f, 0.0f, 1.0f);
 }

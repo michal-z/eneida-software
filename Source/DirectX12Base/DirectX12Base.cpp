@@ -126,8 +126,8 @@ static HWND MakeWindow(const char *name, uint32_t resolutionX, uint32_t resoluti
 static void Setup()
 {
 	/* pso */ {
-		eastl::vector<uint8_t> vsCode = LoadFile(k_ProjectName"Data/Shaders/TriangleVs.cso");
-		eastl::vector<uint8_t> psCode = LoadFile(k_ProjectName"Data/Shaders/TrianglePs.cso");
+		eastl::vector<uint8_t> vsCode = LoadFile(k_ProjectName"_Data/Shaders/TriangleVs.cso");
+		eastl::vector<uint8_t> psCode = LoadFile(k_ProjectName"_Data/Shaders/TrianglePs.cso");
 
 		D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 		{
