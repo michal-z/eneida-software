@@ -1,5 +1,6 @@
 #include "Pch.h"
 #include "Renderer.h"
+#include "tbb/tbbmalloc_proxy.h"
 using namespace DirectX;
 
 
