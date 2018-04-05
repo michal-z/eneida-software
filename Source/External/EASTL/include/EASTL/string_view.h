@@ -50,7 +50,7 @@ namespace eastl
 		EA_CONSTEXPR basic_string_view() EA_NOEXCEPT : mpBegin(nullptr), mnCount(0) {}
 		EA_CONSTEXPR basic_string_view(const basic_string_view& other) EA_NOEXCEPT = default;
 		EA_CONSTEXPR basic_string_view(const T* s, size_type count) : mpBegin(s), mnCount(count) {}
-		EA_CONSTEXPR basic_string_view(const T* s) : mpBegin(s), mnCount(CharStrlen(s)) {}
+		EA_CONSTEXPR basic_string_view(const T* s) : mpBegin(s), mnCount(s != nullptr ? CharStrlen(s) : 0) {}
 		basic_string_view& operator=(const basic_string_view& view) = default;
 
 		// 21.4.2.2, iterator support
@@ -158,9 +158,19 @@ namespace eastl
 			return this_type(mpBegin + pos, count);
 		}
 
-		EA_CONSTEXPR int compare(basic_string_view sw) const EA_NOEXCEPT
+		static EA_CPP14_CONSTEXPR int compare(const T* pBegin1, const T* pEnd1, const T* pBegin2, const T* pEnd2)
 		{
-			return Compare(mpBegin, sw.data(), eastl::min_alt(size(), sw.size()));
+			const ptrdiff_t n1   = pEnd1 - pBegin1;
+			const ptrdiff_t n2   = pEnd2 - pBegin2;
+			const ptrdiff_t nMin = eastl::min_alt(n1, n2);
+			const int       cmp  = Compare(pBegin1, pBegin2, (size_t)nMin);
+
+			return (cmp != 0 ? cmp : (n1 < n2 ? -1 : (n1 > n2 ? 1 : 0)));
+		}
+
+		EA_CPP14_CONSTEXPR int compare(basic_string_view sw) const EA_NOEXCEPT
+		{
+			return compare(mpBegin, mpBegin + mnCount, sw.mpBegin, sw.mpBegin + sw.mnCount);
 		}
 
 		EA_CONSTEXPR int compare(size_type pos1, size_type count1, basic_string_view sw) const
@@ -458,10 +468,11 @@ namespace eastl
 	{
 		size_t operator()(const string_view& x) const
 		{
-			const unsigned char* p = (const unsigned char*)x.data(); // To consider: limit p to at most 256 chars.
-			unsigned int c, result = 2166136261U; // We implement an FNV-like string hash. 
-			while((c = *p++) != 0) // Using '!=' disables compiler warnings.
-				result = (result * 16777619) ^ c;
+			string_view::const_iterator p = x.cbegin();
+			string_view::const_iterator end = x.cend();
+			uint32_t result = 2166136261U; // We implement an FNV-like string hash.
+			while (p != end)
+				result = (result * 16777619) ^ (uint8_t)*p++;
 			return (size_t)result;
 		}
 	};
@@ -470,10 +481,11 @@ namespace eastl
 	{
 		size_t operator()(const u16string_view& x) const
 		{
-			const char16_t* p = x.data();
-			unsigned int c, result = 2166136261U;
-			while((c = *p++) != 0)
-				result = (result * 16777619) ^ c;
+			u16string_view::const_iterator p = x.cbegin();
+			u16string_view::const_iterator end = x.cend();
+			uint32_t result = 2166136261U;
+			while (p != end)
+				result = (result * 16777619) ^ (uint16_t)*p++;
 			return (size_t)result;
 		}
 	};
@@ -482,10 +494,11 @@ namespace eastl
 	{
 		size_t operator()(const u32string_view& x) const
 		{
-			const char32_t* p = x.data();
-			unsigned int c, result = 2166136261U;
-			while((c = (unsigned int)*p++) != 0)
-				result = (result * 16777619) ^ c;
+			u32string_view::const_iterator p = x.cbegin();
+			u32string_view::const_iterator end = x.cend();
+			uint32_t result = 2166136261U;
+			while (p != end)
+				result = (result * 16777619) ^ (uint32_t)*p++;
 			return (size_t)result;
 		}
 	};
@@ -495,10 +508,11 @@ namespace eastl
 		{
 			size_t operator()(const wstring_view& x) const
 			{
-				const wchar_t* p = x.data();
-				unsigned int c, result = 2166136261U;
-				while((c = (unsigned int)*p++) != 0)
-					result = (result * 16777619) ^ c;
+				wstring_view::const_iterator p = x.cbegin();
+				wstring_view::const_iterator end = x.cend();
+				uint32_t result = 2166136261U;
+				while (p != end)
+					result = (result * 16777619) ^ (uint32_t)*p++;
 				return (size_t)result;
 			}
 		};

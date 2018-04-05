@@ -223,19 +223,36 @@ int TestAny()
 		VERIFY(a1.has_value());
 	}
 
+	// swap tests
 	{
-		any a1 = 42;
-		any a2 = 24;
-		VERIFY(any_cast<int>(a1) == 42);
-		VERIFY(any_cast<int>(a2) == 24);
+		{
+			any a1 = 42;
+			any a2 = 24;
+			VERIFY(any_cast<int>(a1) == 42);
+			VERIFY(any_cast<int>(a2) == 24);
 
-		a1.swap(a2);
-		VERIFY(any_cast<int>(a1) == 24);
-		VERIFY(any_cast<int>(a2) == 42);
+			a1.swap(a2);
+			VERIFY(any_cast<int>(a1) == 24);
+			VERIFY(any_cast<int>(a2) == 42);
 
-		eastl::swap(a1, a2);
-		VERIFY(any_cast<int>(a1) == 42);
-		VERIFY(any_cast<int>(a2) == 24);
+			eastl::swap(a1, a2);
+			VERIFY(any_cast<int>(a1) == 42);
+			VERIFY(any_cast<int>(a2) == 24);
+		}
+		{
+			any a1 = string("hello");
+			any a2 = string("world");
+			VERIFY(any_cast<string>(a1) == "hello");
+			VERIFY(any_cast<string>(a2) == "world");
+
+			a1.swap(a2);
+			VERIFY(any_cast<string>(a1) == "world");
+			VERIFY(any_cast<string>(a2) == "hello");
+
+			eastl::swap(a1, a2);
+			VERIFY(any_cast<string>(a1) == "hello");
+			VERIFY(any_cast<string>(a2) == "world");
+		}
 	}
 
 	#if EASTL_RTTI_ENABLED
@@ -389,6 +406,13 @@ int TestAny()
 			auto a = make_any<RequiresInitList>(std::initializer_list<int>{1,2,3,4,5,6,7,8});
 			VERIFY(any_cast<RequiresInitList&>(a).sum == 36);
 		}
+	}
+
+	// user reported regression that eastl::any constructor was not decaying the deduced type correctly.
+	{
+		float f = 42.f;
+		eastl::any a(f);
+		VERIFY(any_cast<float>(a) == 42.f);
 	}
 
 	return nErrorCount;

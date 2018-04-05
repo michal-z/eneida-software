@@ -418,26 +418,24 @@ struct TestObject
 		}
 	}
 
-	#if !defined(EA_COMPILER_NO_RVALUE_REFERENCES)
-		// Due to the nature of TestObject, there isn't much special for us to 
-		// do in our move constructor. A move constructor swaps its contents with 
-		// the other object, whhich is often a default-constructed object.
-		TestObject(TestObject&& testObject)
-			: mX(testObject.mX), mbThrowOnCopy(testObject.mbThrowOnCopy), mMagicValue(testObject.mMagicValue)
+	// Due to the nature of TestObject, there isn't much special for us to 
+	// do in our move constructor. A move constructor swaps its contents with 
+	// the other object, whhich is often a default-constructed object.
+	TestObject(TestObject&& testObject)
+		: mX(testObject.mX), mbThrowOnCopy(testObject.mbThrowOnCopy), mMagicValue(testObject.mMagicValue)
+	{
+		++sTOCount;
+		++sTOCtorCount;
+		++sTOMoveCtorCount;
+		mId = sTOCtorCount;  // testObject keeps its mId, and we assign ours anew.
+		testObject.mX = 0;   // We are swapping our contents with the TestObject, so give it our "previous" value.
+		if(mbThrowOnCopy)
 		{
-			++sTOCount;
-			++sTOCtorCount;
-			++sTOMoveCtorCount;
-			mId = sTOCtorCount;  // testObject keeps its mId, and we assign ours anew.
-			testObject.mX = 0;   // We are swapping our contents with the TestObject, so give it our "previous" value.
-			if(mbThrowOnCopy)
-			{
-				#if EASTL_EXCEPTIONS_ENABLED
-					throw "Disallowed TestObject copy";
-				#endif
-			}
+			#if EASTL_EXCEPTIONS_ENABLED
+				throw "Disallowed TestObject copy";
+			#endif
 		}
-	#endif
+	}
 
 	TestObject& operator=(const TestObject& testObject)
 	{
@@ -459,28 +457,26 @@ struct TestObject
 		return *this;
 	}
 
-	#if !defined(EA_COMPILER_NO_RVALUE_REFERENCES)
-		TestObject& operator=(TestObject&& testObject)
+	TestObject& operator=(TestObject&& testObject)
+	{
+		++sTOMoveAssignCount;
+
+		if(&testObject != this)
 		{
-			++sTOMoveAssignCount;
+			eastl::swap(mX, testObject.mX);
+			// Leave mId alone.
+			eastl::swap(mMagicValue, testObject.mMagicValue);
+			eastl::swap(mbThrowOnCopy, testObject.mbThrowOnCopy);
 
-			if(&testObject != this)
+			if(mbThrowOnCopy)
 			{
-				eastl::swap(mX, testObject.mX);
-				// Leave mId alone.
-				eastl::swap(mMagicValue, testObject.mMagicValue);
-				eastl::swap(mbThrowOnCopy, testObject.mbThrowOnCopy);
-
-				if(mbThrowOnCopy)
-				{
-					#if EASTL_EXCEPTIONS_ENABLED
-						throw "Disallowed TestObject copy";
-					#endif
-				}
+				#if EASTL_EXCEPTIONS_ENABLED
+					throw "Disallowed TestObject copy";
+				#endif
 			}
-			return *this;
 		}
-	#endif
+		return *this;
+	}
 
 	~TestObject()
 	{
@@ -1090,50 +1086,50 @@ to_random_access_iterator(const Iterator& i)
 // Example usage:
 //      vector<int, MallocAllocator> intVector;
 //
-    class MallocAllocator
-    {
-	public:
-	    MallocAllocator(const char* = EASTL_NAME_VAL("MallocAllocator"))
-	        : mAllocCount(0), mFreeCount(0), mAllocVolume(0) {}
+class MallocAllocator
+{
+public:
+	MallocAllocator(const char* = EASTL_NAME_VAL("MallocAllocator"))
+		: mAllocCount(0), mFreeCount(0), mAllocVolume(0) {}
 
-	    MallocAllocator(const MallocAllocator& x)
-	        : mAllocCount(x.mAllocCount), mFreeCount(x.mFreeCount), mAllocVolume(x.mAllocVolume) {}
+	MallocAllocator(const MallocAllocator& x)
+		: mAllocCount(x.mAllocCount), mFreeCount(x.mFreeCount), mAllocVolume(x.mAllocVolume) {}
 
-	    MallocAllocator(const MallocAllocator&, const char*) {}
+	MallocAllocator(const MallocAllocator&, const char*) {}
 
-	    MallocAllocator& operator=(const MallocAllocator& x)
-	    {
-		    mAllocCount = x.mAllocCount;
-		    mFreeCount = x.mFreeCount;
-		    mAllocVolume = x.mAllocVolume;
-		    return *this;
-	    }
+	MallocAllocator& operator=(const MallocAllocator& x)
+	{
+		mAllocCount = x.mAllocCount;
+		mFreeCount = x.mFreeCount;
+		mAllocVolume = x.mAllocVolume;
+		return *this;
+	}
 
-	    void* allocate(size_t n, int = 0);
-	    void* allocate(size_t n, size_t, size_t, int = 0); // We don't support alignment, so you can't use this class where alignment is required.
-	    void deallocate(void* p, size_t n);
+	void* allocate(size_t n, int = 0);
+	void* allocate(size_t n, size_t, size_t, int = 0); // We don't support alignment, so you can't use this class where alignment is required.
+	void deallocate(void* p, size_t n);
 
-	    const char* get_name() const { return "MallocAllocator"; }
-	    void set_name(const char*) {}
+	const char* get_name() const { return "MallocAllocator"; }
+	void set_name(const char*) {}
 
-	    static void reset_all()
-	    {
-		    mAllocCountAll = 0;
-		    mFreeCountAll = 0;
-		    mAllocVolumeAll = 0;
-		    mpLastAllocation = NULL;
-	    }
+	static void reset_all()
+	{
+		mAllocCountAll = 0;
+		mFreeCountAll = 0;
+		mAllocVolumeAll = 0;
+		mpLastAllocation = NULL;
+	}
 
-	public:
-	    int mAllocCount;
-	    int mFreeCount;
-	    size_t mAllocVolume;
+public:
+	int mAllocCount;
+	int mFreeCount;
+	size_t mAllocVolume;
 
-	    static int mAllocCountAll;
-	    static int mFreeCountAll;
-	    static size_t mAllocVolumeAll;
-	    static void* mpLastAllocation;
-    };
+	static int mAllocCountAll;
+	static int mFreeCountAll;
+	static size_t mAllocVolumeAll;
+	static void* mpLastAllocation;
+};
 
 inline bool operator==(const MallocAllocator&, const MallocAllocator&) { return true; }
 inline bool operator!=(const MallocAllocator&, const MallocAllocator&) { return false; }
@@ -1168,6 +1164,7 @@ inline bool operator==(const CustomAllocator&, const CustomAllocator&) { return 
 inline bool operator!=(const CustomAllocator&, const CustomAllocator&) { return false; }
 
 
+///////////////////////////////////////////////////////////////////////////////
 /// UnequalAllocator
 ///
 /// Acts the same as eastl::allocator, but always compares as unequal to an 
@@ -1200,6 +1197,104 @@ protected:
 
 inline bool operator==(const UnequalAllocator&, const UnequalAllocator&) { return false; }
 inline bool operator!=(const UnequalAllocator&, const UnequalAllocator&) { return true; }
+
+
+///////////////////////////////////////////////////////////////////////////////
+/// CountingAllocator
+///
+/// Counts allocation events allowing unit tests to validate assumptions.
+///
+class CountingAllocator
+{
+public:
+	EASTL_ALLOCATOR_EXPLICIT CountingAllocator(const char* pName = EASTL_NAME_VAL(EASTL_ALLOCATOR_DEFAULT_NAME))
+	    : mAllocator(pName)
+	{
+		totalCtorCount++;
+		defaultCtorCount++;
+	}
+
+	CountingAllocator(const CountingAllocator& x) : mAllocator(x.mAllocator) 
+	{
+		totalCtorCount++;
+		copyCtorCount++;
+	}
+
+	CountingAllocator(const CountingAllocator& x, const char* pName) : mAllocator(x.mAllocator)
+	{
+		totalCtorCount++;
+		copyCtorCount++;
+		set_name(pName);
+	}
+
+	CountingAllocator& operator=(const CountingAllocator& x)
+	{
+		mAllocator = x.mAllocator;
+		assignOpCount++;
+		return *this;
+	}
+
+	void* allocate(size_t n, int flags = 0)
+	{
+		activeAllocCount++;
+		totalAllocCount++;
+		totalAllocatedMemory += n;
+		activeAllocatedMemory += n;
+		return mAllocator.allocate(n, flags);
+	}
+
+	void* allocate(size_t n, size_t alignment, size_t offset, int flags = 0)
+	{
+		activeAllocCount++;
+		totalAllocCount++;
+		totalAllocatedMemory += n;
+		activeAllocatedMemory += n;
+		return mAllocator.allocate(n, alignment, offset, flags);
+	}
+
+	void deallocate(void* p, size_t n)
+	{
+		activeAllocCount--;
+		totalDeallocCount--;
+		activeAllocatedMemory -= n;
+		return mAllocator.deallocate(p, n);
+	}
+
+	const char* get_name() const          { return mAllocator.get_name(); }
+	void set_name(const char* pName)      { mAllocator.set_name(pName); }
+
+	static auto getAllocationCount()      { return totalAllocCount; }
+	static auto getTotalAllocationSize()  { return totalAllocatedMemory; }
+	static auto getActiveAllocationSize() { return activeAllocatedMemory; }
+
+	static void resetCount()
+	{
+		activeAllocCount      = 0;
+		totalAllocCount       = 0;
+		totalDeallocCount     = 0;
+		totalCtorCount        = 0;
+		defaultCtorCount      = 0;
+		copyCtorCount         = 0;
+		assignOpCount         = 0;
+		totalAllocatedMemory  = 0;
+		activeAllocatedMemory = 0;
+	}
+
+	eastl::allocator mAllocator;
+
+	static uint64_t activeAllocCount;
+	static uint64_t totalAllocCount;
+	static uint64_t totalDeallocCount;
+	static uint64_t totalCtorCount;
+	static uint64_t defaultCtorCount;
+	static uint64_t copyCtorCount;
+	static uint64_t assignOpCount;
+	static uint64_t totalAllocatedMemory;  // the total amount of memory allocated
+	static uint64_t activeAllocatedMemory; // currently allocated memory by allocator
+};
+
+inline bool operator==(const CountingAllocator& rhs, const CountingAllocator& lhs) { return rhs.mAllocator == lhs.mAllocator; }
+inline bool operator!=(const CountingAllocator& rhs, const CountingAllocator& lhs) { return !(rhs == lhs); }
 
 
 ///////////////////////////////////////////////////////////////////////////////

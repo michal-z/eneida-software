@@ -1,9 +1,10 @@
 #include "Pch.h"
 #include "Renderer.h"
+#include "tbb/scalable_allocator.h"
 using namespace DirectX;
 
 
-#define k_ProjectName "Triangle"
+#define k_ProjectName "DirectX12Base"
 #define k_ResolutionX 1280
 #define k_ResolutionY 720
 #define k_SwapBufferCount 4
@@ -15,14 +16,38 @@ static ID3D12Resource *s_TriangleVb;
 static ID3D12Resource *s_Cb;
 static void *s_CbCpuAddr;
 
+void *operator new(size_t size)
+{
+	return scalable_malloc(size);
+}
+
+void *operator new[](size_t size)
+{
+	return scalable_malloc(size);
+}
+
 void *operator new[](size_t size, const char* /*name*/, int /*flags*/, unsigned /*debugFlags*/, const char* /*file*/, int /*line*/)
 {
-	return malloc(size);
+	return scalable_malloc(size);
 }
 
 void *operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* /*name*/, int /*flags*/, unsigned /*debugFlags*/, const char* /*file*/, int /*line*/)
 {
-	return _aligned_offset_malloc(size, alignment, alignmentOffset);
+	if ((alignmentOffset % alignment) == 0)
+		return scalable_aligned_malloc(size, alignment);
+	return nullptr;
+}
+
+void operator delete(void *p)
+{
+	if (p)
+		scalable_free(p); // handles scalable_malloc and scalable_aligned_malloc
+}
+
+void operator delete[](void *p)
+{
+	if (p)
+		scalable_free(p); // handles scalable_malloc and scalable_aligned_malloc
 }
 
 static double GetTime()
@@ -126,8 +151,8 @@ static HWND MakeWindow(const char *name, uint32_t resolutionX, uint32_t resoluti
 static void Setup()
 {
 	/* pso */ {
-		eastl::vector<uint8_t> vsCode = LoadFile(k_ProjectName"_Data/Shaders/TriangleVs.cso");
-		eastl::vector<uint8_t> psCode = LoadFile(k_ProjectName"_Data/Shaders/TrianglePs.cso");
+		eastl::vector<uint8_t> vsCode = LoadFile(k_ProjectName"_Data/Shaders/BasicVs.cso");
+		eastl::vector<uint8_t> psCode = LoadFile(k_ProjectName"_Data/Shaders/BasicPs.cso");
 
 		D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 		{
