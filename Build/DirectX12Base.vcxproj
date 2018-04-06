@@ -53,6 +53,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Source\External\imgui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Source\External\imgui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Source\External\imgui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\$(ProjectName)\Pch.h" />
@@ -60,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\DirectX12Base\Basic.hlsli" />
+    <None Include="..\Source\DirectX12Base\Imgui.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Source\DirectX12Base\BasicPs.hlsl">
@@ -67,6 +80,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="..\Source\DirectX12Base\BasicVs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="..\Source\DirectX12Base\ImguiPs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="..\Source\DirectX12Base\ImguiVs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
@@ -120,7 +141,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\External;..\Source\$(ProjectName);..\Source\External\DirectXMath\Inc;..\Source\External\EASTL\include;..\Source\External\tbb\include;..\Source\External;..\Source\External\EASTL\test\packages\EABase\include\Common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\External;..\Source\$(ProjectName);..\Source\External\DirectXMath\Inc;..\Source\External\EASTL\include;..\Source\External\tbb\include;..\Source\External\EASTL\test\packages\EABase\include\Common;..\Source\External\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4577;4530</DisableSpecificWarnings>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
@@ -137,7 +158,7 @@
       <ShaderModel>5.1</ShaderModel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <EntryPointName>%(Filename)</EntryPointName>
-      <ObjectFileOutput>$(OutDir)$(ProjectName)_Data\Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>$(OutDir)$(ProjectName)Data\Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,7 +169,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Source\External;..\Source\$(ProjectName);..\Source\External\DirectXMath\Inc;..\Source\External\EASTL\include;..\Source\External\tbb\include;..\Source\External;..\Source\External\EASTL\test\packages\EABase\include\Common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Source\External;..\Source\$(ProjectName);..\Source\External\DirectXMath\Inc;..\Source\External\EASTL\include;..\Source\External\tbb\include;..\Source\External\EASTL\test\packages\EABase\include\Common;..\Source\External\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4577;4530</DisableSpecificWarnings>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
@@ -167,7 +188,7 @@
       <ShaderModel>5.1</ShaderModel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <EntryPointName>%(Filename)</EntryPointName>
-      <ObjectFileOutput>$(OutDir)$(ProjectName)_Data\Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>$(OutDir)$(ProjectName)Data\Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

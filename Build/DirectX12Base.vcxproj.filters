@@ -4,6 +4,9 @@
     <Filter Include="EASTL">
       <UniqueIdentifier>{a6cfa53f-ee58-404f-9299-c43a47022118}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{eb619cc8-57c1-4cdd-93b3-bc01fdf6ed21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\External\EASTL\source\allocator_eastl.cpp">
@@ -36,6 +39,15 @@
     <ClCompile Include="..\Source\$(ProjectName)\Renderer.cpp" />
     <ClCompile Include="..\Source\$(ProjectName)\Pch.cpp" />
     <ClCompile Include="..\Source\$(ProjectName)\$(ProjectName).cpp" />
+    <ClCompile Include="..\Source\External\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\External\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\External\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\$(ProjectName)\Pch.h" />
@@ -44,8 +56,11 @@
   <ItemGroup>
     <FxCompile Include="..\Source\DirectX12Base\BasicPs.hlsl" />
     <FxCompile Include="..\Source\DirectX12Base\BasicVs.hlsl" />
+    <FxCompile Include="..\Source\DirectX12Base\ImguiPs.hlsl" />
+    <FxCompile Include="..\Source\DirectX12Base\ImguiVs.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\DirectX12Base\Basic.hlsli" />
+    <None Include="..\Source\DirectX12Base\Imgui.hlsli" />
   </ItemGroup>
 </Project>

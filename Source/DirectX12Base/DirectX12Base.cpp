@@ -8,7 +8,7 @@ using namespace DirectX;
 #define k_ResolutionX 1280
 #define k_ResolutionY 720
 #define k_SwapBufferCount 4
-#define k_TriangleCount 8
+#define k_TriangleCount 24
 
 static ID3D12PipelineState *s_Pso;
 static ID3D12RootSignature *s_Rs;
@@ -151,8 +151,8 @@ static HWND MakeWindow(const char *name, uint32_t resolutionX, uint32_t resoluti
 static void Setup()
 {
 	/* pso */ {
-		eastl::vector<uint8_t> vsCode = LoadFile(k_ProjectName"_Data/Shaders/BasicVs.cso");
-		eastl::vector<uint8_t> psCode = LoadFile(k_ProjectName"_Data/Shaders/BasicPs.cso");
+		eastl::vector<uint8_t> vsCode = LoadFile(k_ProjectName"Data/Shaders/BasicVs.cso");
+		eastl::vector<uint8_t> psCode = LoadFile(k_ProjectName"Data/Shaders/BasicPs.cso");
 
 		D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 		{
@@ -185,11 +185,12 @@ static void Setup()
 		VHR(s_TriangleVb->Map(0, &CD3DX12_RANGE(0, 0), (void **)&ptr));
 		for (int32_t i = 0; i < k_TriangleCount; ++i)
 		{
-			*ptr++ = XMFLOAT3(-size, -size, 0.0f);
-			*ptr++ = XMFLOAT3(size, -size, 0.0f);
-			*ptr++ = XMFLOAT3(0.0f, size, 0.0f);
-			*ptr++ = XMFLOAT3(-size, -size, 0.0f);
-			size -= 0.1f;
+			float z = i * 0.03f;
+			*ptr++ = XMFLOAT3(-size, -size, z);
+			*ptr++ = XMFLOAT3(size, -size, z);
+			*ptr++ = XMFLOAT3(0.0f, size, z);
+			*ptr++ = XMFLOAT3(-size, -size, z);
+			size -= 0.03f;
 		}
 		s_TriangleVb->Unmap(0, nullptr);
 	}
@@ -205,8 +206,8 @@ static void Setup()
 static void Update(double time, float deltaTime)
 {
 	XMMATRIX objectToProj =
-		XMMatrixRotationY((float)time) *
-		XMMatrixLookAtLH(XMVectorSet(2.0f, 2.0f, 2.0f, 1.0f), XMVectorReplicate(0.0f), XMVectorSet(0.0, 1.0f, 0.0f, 0.0f)) *
+		XMMatrixRotationY((float)time * 0.5f) *
+		XMMatrixLookAtLH(XMVectorSet(1.7f, 0.0f, 1.7f, 1.0f), XMVectorReplicate(0.0f), XMVectorSet(0.0, 1.0f, 0.0f, 0.0f)) *
 		XMMatrixPerspectiveFovLH(XM_PI / 3, (float)k_ResolutionX / k_ResolutionY, 0.1f, 10.0f);
 
 	XMStoreFloat4x4A((XMFLOAT4X4A *)s_CbCpuAddr, XMMatrixTranspose(objectToProj));

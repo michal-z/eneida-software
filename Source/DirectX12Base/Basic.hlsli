@@ -1,6 +1,8 @@
-#define RootSigDecl \
+#define BasicRs \
     "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
 	"CBV(b0, visibility = SHADER_VISIBILITY_VERTEX)"
+
+#if defined(VS_BASIC)
 
 struct ConstData
 {
@@ -8,10 +10,7 @@ struct ConstData
 };
 ConstantBuffer<ConstData> s_Cb;
 
-
-#if defined(VS_BASIC)
-
-[RootSignature(RootSigDecl)]
+[RootSignature(BasicRs)]
 float4 BasicVs(float3 pos : POSITION) : SV_POSITION
 {
 	return mul(float4(pos, 1.0f), s_Cb.worldToProj);
@@ -19,7 +18,7 @@ float4 BasicVs(float3 pos : POSITION) : SV_POSITION
 
 #elif defined(PS_BASIC)
 
-[RootSignature(RootSigDecl)]
+[RootSignature(BasicRs)]
 float4 BasicPs() : SV_TARGET
 {
 	return float4(0.0f, 0.5f, 0.0f, 1.0f);
